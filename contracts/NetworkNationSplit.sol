@@ -5,15 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract NetworkNationSplit is UUPSUpgradeable, OwnableUpgradeable {
-    // Store an array of addresses and their corresponding percentages
-    mapping(address => uint256) public feeDistribution;
-    mapping(uint256 => uint256) public totalPercentage;
-
     // Store the network admin address
     address public networkAdmin;
 
+    // Store the fee distribution for each partner address
+    mapping(address => uint256) public feeDistribution;
+
     modifier only_admin {
-        require(msg.sender == networkAdmin, "");
+        require(msg.sender == networkAdmin, "Only the network admin can perform this action.");
         _;
     }
 
@@ -34,41 +33,32 @@ contract NetworkNationSplit is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     // Function to set the fee distribution for an address
-    function setFeeDistribution(address _address, uint _percentage) public only_admin {
-       
+    function setFeeDistribution(address _address, uint256 _percentage) public only_admin {
         feeDistribution[_address] = _percentage;
     }
 
+    function collectFee(address[] memory partners, uint256[] memory percentages) public payable {
+        require(msg.value == sum(percentages), "The sum of the percentages must equal the value sent with the transaction.");
 
-  function collectFee(uint amount, address[]memory partners) public payable {
-        
-        // Calculate the total percentage
+        // Ensure that the number of partners matches the number of percentages
+        require(partners.length == percentages.length, "The number of partners and the number of percentages must match.");
 
-            require (msg.value == amount, "Insufficient amount sent");
-            
-            //to do : Implement Split among addresses
-            uint256 j = 0;
+        // Iterate through the partners and transfer the appropriate percentage of the fee
+        for (uint256 i = 0; i < partners.length; i++) {
+            require(feeDistribution[partners[i]] == percentages[i], "The percentage for this partner does not match the value in the fee distribution.");
 
-            for(j; j < partners.length; j++) {
-                require(checkAddressValue(partners[j]), "Address is not a partner");
-
-                uint256 _percentage = feeDistribution[partners[j]];
-
-                payable(partners[j]).transfer(msg.value * _percentage);
-
-            }
-
-
+            payable(partners[i]).transfer(msg.value * percentages[i] / sum(percentages));
         }
+    }
 
-
-    function checkAddressValue(address _address) public view returns (bool) {
-    return feeDistribution[_address] != 0;
-   }
-
+    function sum(uint256[] memory percentages) private pure returns (uint256) {
+        uint256 result = 0;
+        for (uint256 i = 0; i < percentages.length; i++) {
+            result += percentages[i];
+        }
+        return result;
+    }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {
     }
-
-    }
-
+}
