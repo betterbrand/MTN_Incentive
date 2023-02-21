@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -38,8 +40,7 @@ contract NetworkNationSplit is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function collectFee(address[] memory partners, uint256[] memory percentages) public payable {
-        require(msg.value == sum(percentages), "The sum of the percentages must equal the value sent with the transaction.");
-
+        require(msg.value > 0, "not enough tokens sent");
         // Ensure that the number of partners matches the number of percentages
         require(partners.length == percentages.length, "The number of partners and the number of percentages must match.");
 
