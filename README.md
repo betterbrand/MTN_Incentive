@@ -1,7 +1,10 @@
 
 //TODO: Remove Network Nations specific code and replace with Morpheus specific code
+
 //TODO: Migrate to Morpheus speocidcations
+
 //TODO: Add security measures
+
 //TODO: calculate and distribute fees based on the "4Cs" system (see Morpheus specifications)
 
 
