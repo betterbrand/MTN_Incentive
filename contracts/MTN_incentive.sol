@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: MIT
 
+//TODO: Remove Network Nations specific code and replace with Morpheus specific code
+//TODO: Migrate to Morpheus speocidcations
+//TODO: Add security measures
+//TODO: calculate and distribute fees based on the "4Cs" system (see Morpheus specifications)
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -10,9 +15,10 @@ contract NetworkNationSplit is UUPSUpgradeable, OwnableUpgradeable {
     // Store the network admin address
     address public networkAdmin;
 
-    // Store the fee distribution for each partner address
-    mapping(address => uint256) public feeDistribution;
-
+    // Store the fee distribution for each all addresses
+    mapping(address => uint256) public feeDistribution; 
+    
+    //TODO: Update security based on Morpheus specs
     modifier only_admin {
         require(msg.sender == networkAdmin, "Only the network admin can perform this action.");
         _;
@@ -35,6 +41,7 @@ contract NetworkNationSplit is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     // Function to set the fee distribution for an address
+    //TODO: replace this function with a function that sets the fee distribution for multiple addresses at once
     function setFeeDistribution(address _address, uint256 _percentage) public only_admin {
         feeDistribution[_address] = _percentage;
     }
